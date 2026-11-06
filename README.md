@@ -6,7 +6,7 @@ Stateless GenAI Microservice for Gymnasyum Smart Reschedule Assistant powered by
 ## 🛠️ Tech Stack
 
 * **Framework:** FastAPI (Python 3.10+)
-* **LLM Engine:** Google Gemini 1.5 Flash (`google-generativeai`)
+* **LLM Engine:** Google Gemini 3.6 Flash (`google-generativeai`)
 * **Intent Classifier:** Scikit-learn (TF-IDF + Calibrated Classifier)
 * **Vector Database (RAG):** ChromaDB
 * **Server:** Uvicorn
