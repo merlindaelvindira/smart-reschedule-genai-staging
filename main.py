@@ -24,7 +24,7 @@ app = FastAPI(
     docs_url="/docs",
 )
 
-# MIDDLEWARE: Prioritas 8 - Mengecek Auth lebih dulu sebelum Body Validation FastAPI
+# MIDDLEWARE
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         if request.url.path == "/analyze" and request.method == "POST":
@@ -89,6 +89,39 @@ def analyze_reschedule_context(context: dict, model_name: str = "gemini-3.6-flas
 
     full_chat_history = "\n".join([f"{m.get('role', 'user')}: {m.get('content', '')}" for m in messages])
 
+    # Ambil pesan terakhir untuk RAG
+    user_messages = [msg.get("content", "") for msg in messages if msg.get("role") == "user"]
+    latest_user_message = user_messages[-1] if user_messages else ""
+
+    # =========================================================
+    # RAG RETRIEVAL (Terintegrasi dengan aman tanpa NameError)
+    # =========================================================
+    relevant_context = """
+    1. Reschedule: Boleh jika ada sisa kuota. Tawarkan jadwal relevan.
+    2. Cancel: Boleh kapan saja. Minta konfirmasi.
+    3. Schedule Inquiry: Tanyakan spesifik kelas apa.
+    4. Confirmation: Catat jika user setuju.
+    5. Other: Jawab pertanyaan pelanggan berdasarkan informasi fasilitas, harga, atau aturan yang tersedia di dalam konteks. Jika maklumat yang ditanyakan sama sekali tidak ada di sini, barulah arahkan ke resepsionis.
+    """
+  
+    if globals().get('collection') is not None and latest_user_message:
+        try:
+            results = collection.query(query_texts=[latest_user_message], n_results=2)
+            if results and results.get('documents') and results['documents'][0]:
+                relevant_context += "\n\nINFORMASI TAMBAHAN DARI DATABASE:\n" + " | ".join(results['documents'][0])
+        except Exception as e:
+            print(f"⚠️ RAG Query Error: {e}")
+
+    # =========================================================
+    # DEBUGGING PRINT
+    # =========================================================
+    print("\n" + "="*50)
+    print("DEBUG OUTPUT: RELEVANT CONTEXT (YANG DIKIRIM KE AI)")
+    print("="*50)
+    print(relevant_context)
+    print("="*50 + "\n")
+    # =========================================================
+
     source_sch = context.get("sourceSchedule", {})
     source_text = (
         f"Judul: {source_sch.get('title', 'N/A')} | Waktu: {source_sch.get('startsAt', 'N/A')}"
@@ -141,7 +174,7 @@ def analyze_reschedule_context(context: dict, model_name: str = "gemini-3.6-flas
             response_mime_type="application/json",
             temperature=0.1
         )
-       
+
         model_instance = genai.GenerativeModel('gemini-3.6-flash')
         response = model_instance.generate_content(prompt, generation_config=generation_config)
         llm_output = json.loads(response.text)
@@ -163,14 +196,14 @@ def analyze_reschedule_context(context: dict, model_name: str = "gemini-3.6-flas
 
     # Logic State
     final_intent = llm_output.get("intent", "Other")
-    
+
     if final_intent == "Reschedule" and final_recommended_ids:
         next_state = "awaiting_confirmation"
     elif final_intent == "Confirmation":
-        next_state = "submitted" 
+        next_state = "submitted"
     else:
         next_state = "active"
-        final_recommended_ids = [] 
+        final_recommended_ids = []
 
     return {
         "intent": final_intent,
@@ -199,7 +232,7 @@ def health_check():
     summary="Analyze chat context and generate response"
 )
 def analyze_endpoint(request: AnalyzeRequest):
-    
+
     if not request.context or "messages" not in request.context:
         return JSONResponse(
             status_code=400,
