@@ -103,7 +103,7 @@ def analyze_reschedule_context(context: dict, model_name: str = "gemini-3.6-flas
     4. Confirmation: Catat jika user setuju.
     5. Other: Jawab pertanyaan pelanggan berdasarkan informasi fasilitas, harga, atau aturan yang tersedia di dalam konteks. Jika maklumat yang ditanyakan sama sekali tidak ada di sini, barulah arahkan ke resepsionis.
     """
-  
+
     if globals().get('collection') is not None and latest_user_message:
         try:
             results = collection.query(query_texts=[latest_user_message], n_results=2)
@@ -255,5 +255,5 @@ def analyze_endpoint(request: AnalyzeRequest):
 
 # 6. APPLICATION RUNNER
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 8787))
     uvicorn.run("main:app", host="0.0.0.0", port=port)
