@@ -1,4 +1,4 @@
-# GenAI Service - Gymnasyum Reschedule Assistant
+# GenAI - Gymnasyum Reschedule Assistant
 
 A stateless Generative AI service built with **FastAPI**, **Google Gemini (3.6 Flash)**, and **ChromaDB**. This service acts as the core AI engine for the Gymnasyum booking system, capable of analyzing customer chat contexts, retrieving gym policies via RAG (Retrieval-Augmented Generation), and outputting structured JSON responses to seamlessly drive the backend state machine.
 
