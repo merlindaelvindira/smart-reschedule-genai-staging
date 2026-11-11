@@ -21,6 +21,6 @@ Make sure to configure the following environment variables before running the ap
 | :--- | :--- | :--- |
 | `GEN_AI_API_KEY` | Bearer token for Backend Authentication | `smart_reschedule_assistant_api_key` |
 | `GEMINI_API_KEY` | Google Gemini API Authorization Key | *Required* |
-| `PORT` | Server listening port | `8000` |
+| `PORT` | Server listening port | `8787` |
 
 ---
