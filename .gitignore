@@ -1,0 +1,48 @@
+%%writefile .gitignore
+# Python / Virtual Environment
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*
+*.pem
+
+# Machine Learning Artifacts & Models
+models/
+*.joblib
+*.pkl
+*.h5
+*.pt
+*.onnx
+
+# Vector Database Storage (ChromaDB)
+gym_vector_db/
+.chroma/
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS System Files
+.DS_Store
+Thumbs.db
+
+# Jupyter / Colab Checkpoints
+.ipynb_checkpoints/
+
+# Logs & Diagnostics
+*.log
+logs/
+
+.env
+__pycache__/
+gym_vector_db/
